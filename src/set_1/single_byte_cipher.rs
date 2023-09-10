@@ -1,6 +1,6 @@
 use std::{str::from_utf8, vec, path::Path, fs::File, io::{BufReader, BufRead}};
 
-use super::{fixed_xor::fixed_xor, hex_to_base64::hex_to_bytes};
+use super::{xor::fixed_xor, hex_to_base64::hex_to_bytes};
 
 /// Find one byte cipher candidates using a scoring of plaintext.
 pub fn solve_one_byte_cipher(input: &[u8]) -> Vec<u8> {
@@ -59,6 +59,7 @@ fn find_in_file(file: &Path) -> Vec<u8> {
 mod tests {
     use super::*;
 
+    // S1C3
     #[test]
     fn one_byte_cipher_happy() {
         let input = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".as_bytes();
@@ -67,6 +68,7 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
+    // S1C4
     #[test]
     fn find_in_file_happy() {
         let file = Path::new("./data/set_1/ch4.txt");

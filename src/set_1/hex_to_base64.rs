@@ -118,6 +118,7 @@ fn byte_to_base64_char(byte: u8) -> u8 {
 mod tests {
     use super::*;
 
+    // S1C1
     #[test]
     fn hex_to_base64_happy() {
         let input = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".as_bytes();
