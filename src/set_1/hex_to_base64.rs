@@ -15,26 +15,44 @@ pub fn hex_to_base64(input: &[u8]) -> Option<Vec<u8>> {
 }
 
 /// Convert an array of hex bytes into their binary representation.
-fn hex_to_bytes(hex: &[u8]) -> Vec<u8> {
+pub fn hex_to_bytes(hex: &[u8]) -> Vec<u8> {
     let mut res = vec![];
     for i in (0..hex.len()).step_by(2) {
         let b1 = hex_to_int(hex[i]);
         let b2 = hex_to_int(hex[i+1]);
-        eprintln!("Converting 0x{}{} to binary", hex[i] as char, hex[i+1] as char);
         let b = (b1 << 4) | b2;
-        eprintln!("\t\tbyte: {}", b);
         res.push(b);
+    }
+    res
+}
+
+/// Convert a hex byte array back to its hex representation.
+pub fn bytes_to_hex(bytes: &[u8]) -> Vec<u8> {
+    let mut res = vec![];
+    for i in 0..bytes.len() {
+        res.push(int_to_hex(bytes[i] >> 4));
+        res.push(int_to_hex(bytes[i]));
     }
     res
 }
 
 /// Convert a hexadecimal byte to its binary representation. Panics if a
 /// non-hex byte is input.
-fn hex_to_int(hex: u8) -> u8 {
+pub fn hex_to_int(hex: u8) -> u8 {
     match hex {
         48..=57  => hex - 48,      // 0-9
         65..=70  => hex - 65 + 10, // A-F
         97..=102 => hex - 97 + 10, // a-f
+        _ => panic!()
+    }
+}
+
+/// Converts the bottom four bits of a u8 into its hex char.
+pub fn int_to_hex(int: u8) -> u8 {
+    let int = int & 0b0000_1111;
+    match int {
+        0..=9 => int + 48,
+        10..=15 => int + 87,
         _ => panic!()
     }
 }
@@ -60,7 +78,7 @@ fn hex_to_int(hex: u8) -> u8 {
 ///
 /// Saved back as ASCII byte representation of those chars:
 /// 01010001  01010101  01001010  01000100
-fn bytes_to_base64(bytes: &[u8]) -> Vec<u8> {
+pub fn bytes_to_base64(bytes: &[u8]) -> Vec<u8> {
     let mut res = vec![];
     let n = bytes.len();
     let pad = n % 3;
@@ -116,4 +134,19 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
+    #[test]
+    fn hex_to_bytes_happy() {
+        let input = "17c0".as_bytes();
+        let expected = vec![0b0001_0111, 0b1100_0000];
+        let actual = hex_to_bytes(&input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn bytes_to_hex_happy() {
+        let input = vec![0b0001_0111, 0b1100_0000];
+        let expected = "17c0".as_bytes();
+        let actual = bytes_to_hex(&input);
+        assert_eq!(expected, actual);
+    }
 }
