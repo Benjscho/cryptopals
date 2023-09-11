@@ -117,7 +117,7 @@ pub fn base64_to_bytes(input: &[u8]) -> Vec<u8> {
             continue
         }
         let b1 = (base64_char_to_byte(input[i]) << 2) | (base64_char_to_byte(input[i + 1]) >> 4);
-        eprintln!("{:#010b}", b1);
+        //eprintln!("{:#010b}", b1);
         res.push(b1);
         if input[i + 2] != b'=' {
             let b2 = (base64_char_to_byte(input[i + 1]) << 4) | (base64_char_to_byte(input[i + 2]) >> 2);
