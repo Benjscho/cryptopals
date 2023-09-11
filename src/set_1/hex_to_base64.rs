@@ -1,3 +1,5 @@
+use std::str::from_utf8;
+
 ///! This module is for Set 1, challenge 1. It converts hex to base64.
 ///
 /// Per the cryptopals Rule, we have to always operate on raw bytes, never
@@ -108,10 +110,43 @@ pub fn bytes_to_base64(bytes: &[u8]) -> Vec<u8> {
     res
 }
 
+pub fn base64_to_bytes(input: &[u8]) -> Vec<u8> {
+    let mut res = vec![];
+    for i in (0..input.len()).step_by(4) {
+        if input[i] == b'\n' {
+            continue
+        }
+        let b1 = (base64_char_to_byte(input[i]) << 2) | (base64_char_to_byte(input[i + 1]) >> 4);
+        eprintln!("{:#010b}", b1);
+        res.push(b1);
+        if input[i + 2] != b'=' {
+            let b2 = (base64_char_to_byte(input[i + 1]) << 4) | (base64_char_to_byte(input[i + 2]) >> 2);
+            res.push(b2);
+            if input[i + 3] != b'=' {
+                let b3 = (base64_char_to_byte(input[i + 2]) << 6) | base64_char_to_byte(input[i + 3]);
+                res.push(b3);
+            }
+        }
+    }
+    res
+}
+
 /// Looks up the byte in the base64 char table.
 fn byte_to_base64_char(byte: u8) -> u8 {
     // We want to ignore the top two bits
     BASE64_CHAR_TABLE[(byte & 0b0011_1111) as usize]
+}
+
+/// Reverse lookup, converts a base64 char to its decimal index.
+fn base64_char_to_byte(char: u8) -> u8 {
+    match char {
+        65..=90 => char - 65,
+        97..=122 => char - 97 + 26,
+        48..=57 => char - 48 + 52,
+        b'+' => 62,
+        b'/' => 63,
+        _ => panic!()
+    }
 }
 
 #[cfg(test)]
@@ -129,9 +164,32 @@ mod tests {
 
     #[test]
     fn bytes_to_base64_happy() {
-        let input = vec![65, 66, 67];
+        let input = "ABC".as_bytes();
         let expected = "QUJD".as_bytes();
         let actual = bytes_to_base64(&input);
+        assert_eq!(expected, actual);
+    }
+
+    fn base64_to_bytes_happy() {
+        let input = "QUJD".as_bytes();
+        let expected = "ABC".as_bytes();
+        let actual = base64_to_bytes(&input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn base64_to_bytes_happy_2() {
+        let input = "YXNk".as_bytes();
+        let expected = "asd".as_bytes();
+        let actual = base64_to_bytes(&input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn base64_to_bytes_happy_3() {
+        let input = "YXNkdWhmOTcxaDJARkEoUVdITkZtIkFTUEQiT3En".as_bytes();
+        let expected = "asduhf971h2@FA(QWHNFm\"ASPD\"Oq'".as_bytes();
+        let actual = base64_to_bytes(&input);
         assert_eq!(expected, actual);
     }
 

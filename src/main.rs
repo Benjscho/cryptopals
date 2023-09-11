@@ -5,7 +5,7 @@ use set_1::xor::repeating_key_xor;
 
 use crate::set_1::hex_to_base64::bytes_to_hex;
 
-mod set_1;
+pub mod set_1;
 
 #[derive(Parser)]
 struct Cli {
