@@ -1,6 +1,8 @@
 use std::{str::from_utf8, vec, path::Path, fs::File, io::{BufReader, BufRead}};
 
-use super::{xor::fixed_xor, hex_to_base64::hex_to_bytes};
+use crate::byte_util::hex_decode;
+
+use super::xor::fixed_xor;
 
 /// Find one byte cipher candidates using a scoring of plaintext.
 pub fn solve_one_byte_cipher(input: &[u8]) -> (Vec<u8>, u8) {
@@ -22,7 +24,7 @@ pub fn solve_one_byte_cipher(input: &[u8]) -> (Vec<u8>, u8) {
 }
 
 pub fn solve_one_byte_cipher_hex(input: &[u8]) -> (Vec<u8>, u8) {
-    let input = hex_to_bytes(input);
+    let input = hex_decode(input);
     solve_one_byte_cipher(&input)
 }
 

@@ -1,21 +1,22 @@
-///! This module is for Set 1, challenge 1. It converts hex to base64.
+///! This module is for byte utils used throughout the cryptopals challenges,
+/// and initially created for Set 1.
 ///
 /// Per the cryptopals Rule, we have to always operate on raw bytes, never
-/// encoded strings. We also should use hex and base64 for pretty-printing
+/// encoded strings. 
 
 const BASE64_CHAR_TABLE: &'static [u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 /// Convert hex strings to base64. If the string is valid hex returns the
 /// converted string, otherwise fails and returns None.
-fn hex_to_base64(input: &[u8]) -> Option<Vec<u8>> {
-    let bytes = hex_to_bytes(input);
-    let result = bytes_to_base64(&bytes);
+pub fn hex_to_base64(input: &[u8]) -> Option<Vec<u8>> {
+    let bytes = hex_decode(input);
+    let result = base64_encode(&bytes);
 
     Some(result)
 }
 
 /// Convert an array of hex bytes into their binary representation.
-fn hex_to_bytes(hex: &[u8]) -> Vec<u8> {
+pub fn hex_decode(hex: &[u8]) -> Vec<u8> {
     let mut res = vec![];
     for i in (0..hex.len()).step_by(2) {
         let b1 = hex_to_int(hex[i]);
@@ -27,7 +28,7 @@ fn hex_to_bytes(hex: &[u8]) -> Vec<u8> {
 }
 
 /// Convert a hex byte array back to its hex representation.
-fn bytes_to_hex(bytes: &[u8]) -> Vec<u8> {
+pub fn hex_encode(bytes: &[u8]) -> Vec<u8> {
     let mut res = vec![];
     for i in 0..bytes.len() {
         res.push(int_to_hex(bytes[i] >> 4));
@@ -78,7 +79,7 @@ fn int_to_hex(int: u8) -> u8 {
 ///
 /// Saved back as ASCII byte representation of those chars:
 /// 01010001  01010101  01001010  01000100
-fn bytes_to_base64(bytes: &[u8]) -> Vec<u8> {
+pub fn base64_encode(bytes: &[u8]) -> Vec<u8> {
     let mut res = vec![];
     let n = bytes.len();
     let pad = n % 3;
@@ -108,7 +109,7 @@ fn bytes_to_base64(bytes: &[u8]) -> Vec<u8> {
     res
 }
 
-pub fn base64_to_bytes(input: &[u8]) -> Vec<u8> {
+pub fn base64_decode(input: &[u8]) -> Vec<u8> {
     let mut res = vec![];
     for i in (0..input.len()).step_by(4) {
         if input[i] == b'\n' {
@@ -164,15 +165,14 @@ mod tests {
     fn bytes_to_base64_happy() {
         let input = "ABC".as_bytes();
         let expected = "QUJD".as_bytes();
-        let actual = bytes_to_base64(&input);
+        let actual = base64_encode(&input);
         assert_eq!(expected, actual);
     }
 
-    #[test]
     fn base64_to_bytes_happy() {
         let input = "QUJD".as_bytes();
         let expected = "ABC".as_bytes();
-        let actual = base64_to_bytes(&input);
+        let actual = base64_decode(&input);
         assert_eq!(expected, actual);
     }
 
@@ -180,7 +180,7 @@ mod tests {
     fn base64_to_bytes_happy_2() {
         let input = "YXNk".as_bytes();
         let expected = "asd".as_bytes();
-        let actual = base64_to_bytes(&input);
+        let actual = base64_decode(&input);
         assert_eq!(expected, actual);
     }
 
@@ -188,7 +188,7 @@ mod tests {
     fn base64_to_bytes_happy_3() {
         let input = "YXNkdWhmOTcxaDJARkEoUVdITkZtIkFTUEQiT3En".as_bytes();
         let expected = "asduhf971h2@FA(QWHNFm\"ASPD\"Oq'".as_bytes();
-        let actual = base64_to_bytes(&input);
+        let actual = base64_decode(&input);
         assert_eq!(expected, actual);
     }
 
@@ -196,7 +196,7 @@ mod tests {
     fn hex_to_bytes_happy() {
         let input = "17c0".as_bytes();
         let expected = vec![0b0001_0111, 0b1100_0000];
-        let actual = hex_to_bytes(&input);
+        let actual = hex_decode(&input);
         assert_eq!(expected, actual);
     }
 
@@ -204,7 +204,8 @@ mod tests {
     fn bytes_to_hex_happy() {
         let input = vec![0b0001_0111, 0b1100_0000];
         let expected = "17c0".as_bytes();
-        let actual = bytes_to_hex(&input);
+        let actual = hex_encode(&input);
         assert_eq!(expected, actual);
     }
 }
+
