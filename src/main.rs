@@ -6,6 +6,7 @@ use set_1::xor::repeating_key_xor;
 use crate::byte_util::hex_encode;
 
 pub mod set_1;
+pub mod set_2;
 pub mod byte_util;
 
 #[derive(Parser)]
