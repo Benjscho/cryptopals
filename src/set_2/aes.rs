@@ -45,26 +45,31 @@ pub fn decrypt_aes_128_cbc(input: &[u8], key: &[u8], iv: Option<&[u8]>) -> Vec<u
 }
 
 pub fn encrypt_aes_128_ecb(data: &[u8], key: &[u8]) -> Vec<u8> {
+    let input = pkcs7_padding(data, 16);
     let c = Cipher::aes_128_ecb();
     let mut encrypter = Crypter::new(c, Mode::Encrypt, key, None).unwrap();
-    let mut ciphertext = vec![0; data.len() * 2];
     encrypter.pad(false);
-    encrypter.update(data, &mut ciphertext).unwrap();
-    ciphertext.resize(16, b'\0');
+    let mut ciphertext = vec![0; data.len() + 16];
+    for i in (0..data.len()).step_by(16) {
+        encrypter.update(&data[i..i+16], &mut ciphertext[i/16..]).unwrap();
+    }
+    ciphertext.resize(data.len(), b'\0');
     ciphertext
 }
 
 pub fn decrypt_aes_128_ecb(data: &[u8], key: &[u8]) -> Vec<u8> {
     let c = Cipher::aes_128_ecb();
     let mut encrypter = Crypter::new(c, Mode::Decrypt, key, None).unwrap();
-    let mut ciphertext = vec![0; data.len() * 2];
+    let mut ciphertext = vec![0; data.len() + 16];
     encrypter.pad(false);
-    encrypter.update(data, &mut ciphertext).unwrap();
-    ciphertext.resize(16, b'\0');
+    for i in (0..data.len()).step_by(16) {
+        encrypter.update(&data[i..i+16], &mut ciphertext[i/16..]).unwrap();
+    }
+    ciphertext.resize(data.len(), b'\0');
     ciphertext
 }
 
-fn pkcs7_padding(input: &[u8], block_length: usize) -> Vec<u8> {
+pub fn pkcs7_padding(input: &[u8], block_length: usize) -> Vec<u8> {
     let mut res = vec![];
 
     for i in 0..input.len() {

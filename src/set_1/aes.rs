@@ -11,8 +11,8 @@ pub fn decrypt_aes_128_ecb(data: &[u8], key: &[u8]) -> Vec<u8> {
 /// and deterministic. The same 16 byte plaintext block will always produce
 /// the same 16 byte cipher text.
 ///
-/// This means that if we can assume that some repeated plaintext blocks occur 
-/// the same block offsets, then we can look for repeated ciphertext blocks 
+/// This means that if we can assume that some repeated plaintext blocks occur
+/// the same block offsets, then we can look for repeated ciphertext blocks
 /// to identify if this is the case.
 pub fn detect_aes_128_ecb(data: &[u8]) -> bool {
     let mut blocks: HashSet<&[u8]> = HashSet::new();
