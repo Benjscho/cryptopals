@@ -2,7 +2,7 @@
 /// and initially created for Set 1.
 ///
 /// Per the cryptopals Rule, we have to always operate on raw bytes, never
-/// encoded strings. 
+/// encoded strings.
 
 const BASE64_CHAR_TABLE: &'static [u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -109,6 +109,7 @@ pub fn base64_encode(bytes: &[u8]) -> Vec<u8> {
     res
 }
 
+/// Decode base64 strings into the resulting bytes.
 pub fn base64_decode(input: &[u8]) -> Vec<u8> {
     let mut res = vec![];
     for i in (0..input.len()).step_by(4) {
@@ -116,7 +117,6 @@ pub fn base64_decode(input: &[u8]) -> Vec<u8> {
             continue
         }
         let b1 = (base64_char_to_byte(input[i]) << 2) | (base64_char_to_byte(input[i + 1]) >> 4);
-        //eprintln!("{:#010b}", b1);
         res.push(b1);
         if input[i + 2] != b'=' {
             let b2 = (base64_char_to_byte(input[i + 1]) << 4) | (base64_char_to_byte(input[i + 2]) >> 2);
